@@ -1,0 +1,18 @@
+meta {
+  name: CriarBlog
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:5177/blogs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "url":"213",
+    "posts":[]
+  }
+}
