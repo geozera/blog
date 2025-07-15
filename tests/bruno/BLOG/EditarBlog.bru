@@ -1,10 +1,10 @@
 meta {
-  name: CriarBlog
+  name: EditarBlog
   type: http
-  seq: 1
+  seq: 6
 }
 
-post {
+patch {
   url: http://localhost:5177/blogs
   body: json
   auth: inherit
@@ -12,8 +12,9 @@ post {
 
 body:json {
   {
+    "blogId":10,
     "title": "First blog post!",
-    "content": "Lorem Ipsum...",
+    "content": "Lorem Ipsum....",
     "author": "Geovany Bezerra"
   }
 }

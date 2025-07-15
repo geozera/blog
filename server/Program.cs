@@ -16,23 +16,25 @@ app.MapPost("/blogs", async (BloggingDbContext db, Blog blog) =>
     return Results.Ok(await db.Blogs.Where(b => b.BlogId == blog.BlogId).FirstAsync());
 });
 
-app.MapPatch("/blogs", async (BloggingDbContext db, Blog blog) =>
+app.MapPut("/blogs", async (BloggingDbContext db, Blog newBlog) =>
 {
 
-    var existingBlog = await db.Blogs.Where(b => b.BlogId == blog.BlogId).FirstOrDefaultAsync();
+    var existingBlog = await db.Blogs.Where(b => b.BlogId == newBlog.BlogId).FirstOrDefaultAsync();
 
-    if (blog == null)
+    if (existingBlog == null)
         return Results.Problem(
-            detail: $"Blog with id ({blog?.BlogId.ToString() ?? "unknown"}) was not found.",
+            detail: $"Blog with id ({newBlog?.BlogId.ToString() ?? "unknown"}) was not found.",
             statusCode: StatusCodes.Status404NotFound,
             title: "Not Found"
         );
 
-    existingBlog = blog;
+    existingBlog.Author = newBlog.Author;
+    existingBlog.Title = newBlog.Title;
+    existingBlog.Content = newBlog.Content;
 
     await db.SaveChangesAsync();
 
-    return Results.Ok(await db.Blogs.Where(b => b.BlogId == blog.BlogId).FirstAsync());
+    return Results.Ok(await db.Blogs.Where(b => b.BlogId == newBlog.BlogId).FirstAsync());
 });
 
 app.MapGet("/blogs", async (BloggingDbContext db) =>
