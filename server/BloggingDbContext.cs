@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace server
 {
-
     public class BloggingDbContext : DbContext
     {
-        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<BlogPost> Posts { get; set; }
+        public DbSet<BlogAttachment> Attachments { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseNpgsql($"Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=blogblog");
@@ -25,32 +26,41 @@ namespace server
         private void SetTimestamps()
         {
             var entries = ChangeTracker.Entries()
-                .Where(e => e.Entity is Blog &&
+                .Where(e => e.Entity is BlogPost &&
                        (e.State == EntityState.Added || e.State == EntityState.Modified));
 
             foreach (var entityEntry in entries)
             {
-                var blog = (Blog)entityEntry.Entity;
-                if (entityEntry.State == EntityState.Added)
-                {
-                    blog.CreatedAt = DateTime.UtcNow;
-                }
+                var blog = (BlogPost)entityEntry.Entity;
 
                 blog.UpdatedAt = DateTime.UtcNow;
             }
         }
     }
 
-    public class Blog
+    public class BlogPost
     {
+        [Key]
         public int BlogId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; }
 
         public string Author { get; set; }
+
+        public List<BlogAttachment> Attachments { get; set; } = [];
+    }
+
+    public class BlogAttachment
+    {
+        [Key]
+        public int Id { get; set; }
+        public int BlogPostId { get; set; }
+        public string FileName { get; set; }
+        public string FileUrl { get; set; }
+
     }
 }

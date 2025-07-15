@@ -6,7 +6,7 @@ meta {
 
 post {
   url: http://localhost:5177/blogs
-  body: json
+  body: multipartForm
   auth: inherit
 }
 
@@ -14,6 +14,14 @@ body:json {
   {
     "title": "First blog post!",
     "content": "Lorem Ipsum...",
-    "author": "Geovany Bezerra"
+    "Author": "Geovany!"
   }
+}
+
+body:multipart-form {
+  title: First blog post!
+  content: Lorem Ipsum...
+  author: Geo
+  files: @file(C:\Users\geo\Desktop\20231110_081029.jpg) @contentType(File)
+  files: @file(C:\Users\geo\Desktop\geodudeFADE.jpg) @contentType(File)
 }

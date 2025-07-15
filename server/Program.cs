@@ -1,25 +1,53 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BloggingDbContext>();
+builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
 var app = builder.Build();
+
+app.UseAntiforgery();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapPost("/blogs", async (BloggingDbContext db, Blog blog) =>
+app.MapPost("/blogs", async ([FromForm] BlogPostRequest postRequest, HttpRequest request, [FromServices] BloggingDbContext db) =>
 {
-    db.Add(blog);
+    var post = new BlogPost { Title = postRequest.Title, Content = postRequest.Content, Author = postRequest.Author };
+    var files = (await request.ReadFormAsync()).Files.GetFiles("files");
 
+    foreach (var file in files)
+    {
+        var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+        var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "images");
+        var filePath = Path.Combine(uploadsDir, fileName);
+        var fileUrl = $"{uploadsDir}/{fileName}";
+
+        if (!Directory.Exists(uploadsDir))
+            Directory.CreateDirectory(uploadsDir);
+
+        using var stream = File.Create(filePath);
+
+        await file.CopyToAsync(stream);
+
+        post.Attachments.Add(new BlogAttachment
+        {
+            FileName = fileName,
+            FileUrl = fileUrl,
+        });
+    }
+
+    db.Posts.Add(post);
     await db.SaveChangesAsync();
 
-    return Results.Ok(await db.Blogs.Where(b => b.BlogId == blog.BlogId).FirstAsync());
-});
+    return Results.Ok(post);
 
-app.MapPut("/blogs", async (BloggingDbContext db, Blog newBlog) =>
+}).DisableAntiforgery();
+
+app.MapPut("/blogs", async (BloggingDbContext db, BlogPost newBlog) =>
 {
 
-    var existingBlog = await db.Blogs.Where(b => b.BlogId == newBlog.BlogId).FirstOrDefaultAsync();
+    var existingBlog = await db.Posts.Where(b => b.BlogId == newBlog.BlogId).FirstOrDefaultAsync();
 
     if (existingBlog == null)
         return Results.Problem(
@@ -34,17 +62,17 @@ app.MapPut("/blogs", async (BloggingDbContext db, Blog newBlog) =>
 
     await db.SaveChangesAsync();
 
-    return Results.Ok(await db.Blogs.Where(b => b.BlogId == newBlog.BlogId).FirstAsync());
+    return Results.Ok(await db.Posts.Where(b => b.BlogId == newBlog.BlogId).FirstAsync());
 });
 
 app.MapGet("/blogs", async (BloggingDbContext db) =>
 {
-    return Results.Ok(await db.Blogs.OrderBy(b => b.BlogId).ToListAsync());
+    return Results.Ok(await db.Posts.OrderBy(b => b.BlogId).ToListAsync());
 });
 
 app.MapGet("/blogs/{id}", async (BloggingDbContext db, int id) =>
 {
-    var blog = await db.Blogs.FirstOrDefaultAsync(b => b.BlogId == id);
+    var blog = await db.Posts.FirstOrDefaultAsync(b => b.BlogId == id);
 
     if (blog == null)
     {
@@ -60,86 +88,30 @@ app.MapGet("/blogs/{id}", async (BloggingDbContext db, int id) =>
 
 app.MapDelete("/blogs/{id}", async (BloggingDbContext db, int id) =>
 {
-    var blogsToDelete = await db.Blogs.Where(b => b.BlogId == id).ToListAsync();
+    var blogsToDelete = await db.Posts.Where(b => b.BlogId == id).ToListAsync();
 
-    blogsToDelete.ForEach(b => db.Blogs.Remove(b));
+    blogsToDelete.ForEach(b => db.Posts.Remove(b));
 
     await db.SaveChangesAsync();
 
 });
 
-app.MapPost("/blogs/upload", async (HttpRequest request) =>
+app.Use(async (context, next) =>
 {
-    if (!request.HasFormContentType)
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<BloggingDbContext>();
+    var isDbAvailable = await db.Database.CanConnectAsync();
+
+    if (!isDbAvailable)
     {
-        return Results.Problem(
-            detail: "Expected multipart/form-data",
-            statusCode: StatusCodes.Status400BadRequest,
-            title: "Incorrect Form Content Type"
-        );
+        context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            title = "Database Connection Failed",
+            status = StatusCodes.Status503ServiceUnavailable
+        });
     }
-
-    var form = await request.ReadFormAsync();
-    var file = form.Files.GetFile("file");
-
-    if (file == null || file.Length == 0)
-    {
-        return Results.Problem(
-            detail: "File is missing or empty.",
-            statusCode: StatusCodes.Status400BadRequest,
-            title: "File Upload Error"
-        );
-    }
-
-    // Allowed image types
-    string[] allowedImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-    long maxFileSize = 5 * 1024 * 1024; // 5 MB
-
-    if (file.Length > maxFileSize)
-    {
-        return Results.Problem(
-            detail: "File is too large. Maximum allowed size is 5MB.",
-            statusCode: StatusCodes.Status413PayloadTooLarge,
-            title: "Payload Too Large"
-        );
-    }
-
-    if (!allowedImageTypes.Contains(file.ContentType))
-    {
-        return Results.Problem(
-            detail: $"Unsupported file type: {file.ContentType}. Only images are allowed.",
-            statusCode: StatusCodes.Status415UnsupportedMediaType,
-            title: "Unsupported Media Type"
-        );
-    }
-
-    var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-
-    // Prevent files without extensions or dangerous inputs
-    if (string.IsNullOrWhiteSpace(extension) || extension.Contains(';') || extension.Contains(".."))
-    {
-        return Results.Problem(
-            detail: "Invalid file extension.",
-            statusCode: StatusCodes.Status400BadRequest,
-            title: "Invalid File"
-        );
-    }
-
-    var fileName = $"{Guid.NewGuid()}{extension}";
-
-    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "images");
-    Directory.CreateDirectory(uploadsFolder);
-
-    var filePath = Path.Combine(uploadsFolder, fileName);
-
-    using (var stream = File.Create(filePath))
-    {
-        await file.CopyToAsync(stream);
-    }
-
-    var fileUrl = $"/uploads/images/{fileName}";
-
-    return Results.Ok(new { url = fileUrl });
+    else await next();
 });
 
 app.Run();
