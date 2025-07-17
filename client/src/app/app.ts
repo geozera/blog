@@ -1,11 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, NgModule, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { CardModule } from 'primeng/card';
+import { FormGroup, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { EditorModule } from 'primeng/editor';
+import { InputTextModule } from 'primeng/inputtext';
+
 
 @Component({
     selector: 'app-root',
@@ -24,6 +28,24 @@ import { CardModule } from 'primeng/card';
             </ng-container>
 
             <ng-container *ngIf="currentPage === 'blog'">
+                <input
+                    type="text"
+                    pInputText
+                    [(ngModel)]="newBlog.title"
+                />
+                <input
+                    type="text"
+                    pInputText
+                    [(ngModel)]="newBlog.author"
+                />
+
+                <p-editor
+                    [(ngModel)]="newBlog.content"
+                    [style]="{ height: '320px' }"
+                ></p-editor>
+
+                <p-button [label]="'Publicar'" (onClick)="onSubmit()" ></p-button>
+
                 <div *ngFor="let post of posts">
                     <p-card [header]="post.title">
                         <div [innerHTML]="post.content"></div>
@@ -64,7 +86,7 @@ import { CardModule } from 'primeng/card';
         </div>
     `,
     styles: [],
-    imports: [ButtonModule, CommonModule, CardModule, MenubarModule]
+    imports: [ButtonModule, CommonModule, CardModule, MenubarModule, EditorModule, FormsModule,InputTextModule]
 })
 export class App implements OnInit {
     currentPage: string = 'home';
@@ -73,6 +95,20 @@ export class App implements OnInit {
     latestPost: { title: string; content: SafeHtml };
 
     menuBarItems: MenuItem[] = [];
+
+    newBlog: {
+        title: string;
+        content: string;
+        author: string;
+    } = {
+        title: '',
+        content: '',
+        author: ''
+    };
+
+    blogForm: FormGroup;
+
+    contentEditorValue: string = '';
 
     constructor(private sanitizer: DomSanitizer) {
         const markdownPosts = [
@@ -92,6 +128,12 @@ export class App implements OnInit {
         }));
 
         this.latestPost = this.posts[0];
+
+        this.blogForm = new FormGroup({
+            title: new FormControl(''),
+            content: new FormControl(''),
+            author: new FormControl('')
+        });
     }
 
     ngOnInit() {
@@ -100,6 +142,10 @@ export class App implements OnInit {
 
     setupComponents() {
         this.setupMenuBar();
+    }
+
+    onSubmit() {
+        console.log('onSubmit! ', this.newBlog);
     }
 
     setupMenuBar() {
