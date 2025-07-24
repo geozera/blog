@@ -13,7 +13,7 @@ export class PostsService {
 
     private POSTS_URL: string = `${this.URL}/blogs`;
 
-    getPosts(): Observable<Post[]> {
+    getPosts(options?: any): Observable<Post[]> {
         return this.http.get<Post[]>(this.POSTS_URL);
     }
 

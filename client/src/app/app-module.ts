@@ -10,9 +10,12 @@ import { Blog } from './blog/blog';
 import { About } from './about/about';
 import { Contact } from './contact/contact';
 import { Home } from './home/home';
+import { ToastModule } from 'primeng/toast';
+import { Intro } from "./intro/intro";
+import { LastPost } from "./last-post/last-post";
 
 @NgModule({
-    declarations: [Home,Blog,About,Contact],
-    imports: [CommonModule,ButtonModule, CommonModule, CardModule, MenubarModule, EditorModule, FormsModule, InputTextModule]
+    declarations: [Home, Blog, About, Contact, Intro, LastPost],
+    imports: [CommonModule, ButtonModule, CommonModule, CardModule, MenubarModule, EditorModule, FormsModule, InputTextModule, ToastModule]
 })
 export class AppModule {}

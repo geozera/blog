@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { FormsModule } from '@angular/forms';
 import { EditorModule } from 'primeng/editor';
@@ -14,6 +14,7 @@ import { AppModule } from './app-module';
     selector: 'app-root',
     templateUrl: './app.html',
     standalone: true,
+    providers:[MessageService],
     imports: [ButtonModule, CommonModule, CardModule, MenubarModule, EditorModule, FormsModule, InputTextModule, RouterModule, AppModule]
 })
 export class App implements OnInit {
@@ -39,7 +40,7 @@ export class App implements OnInit {
             {
                 label: 'Blog',
                 icon: 'pi pi-book',
-                routerLink: 'blog'
+                routerLink: 'blogs'
             },
             {
                 label: 'Sobre Mim',

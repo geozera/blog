@@ -1,29 +1,46 @@
-<ng-container>
-        <input
-            type="text"
-            pInputText
-            [(ngModel)]="newBlog.title"
-        />
-        <input
-            type="text"
-            pInputText
-            [(ngModel)]="newBlog.author"
-        />
+<div class="grid-container-1">
+    <p-button
+        [label]="'Novo post'"
+        [raised]="true"
+        (onClick)="showEditor = !showEditor"
+    ></p-button>
+</div>
 
-        <p-editor
-            [(ngModel)]="newBlog.content"
-            [style]="{ height: '320px' }"
-        ></p-editor>
+@if (showEditor){
+<p-card>
+    <input
+        type="text"
+        pInputText
+        [(ngModel)]="newBlog.title"
+    />
+    <input
+        type="text"
+        pInputText
+        [(ngModel)]="newBlog.author"
+    />
 
-        <p-button
-            [label]="'Publicar'"
-            [raised]="true"
-            (onClick)="onSubmit()"
-        ></p-button>
+    <p-editor
+        [(ngModel)]="newBlog.content"
+        [style]="{ height: '200px' }"
+        [required]="true"
+    ></p-editor>
 
-        <div *ngFor="let post of posts">
-            <p-card [header]="post.title">
-                <div [innerHTML]="post.content"></div>
-            </p-card>
-        </div>
-    </ng-container>
+    <p-button
+        [label]="'Publicar'"
+        [raised]="true"
+        (onClick)="onSubmit()"
+    ></p-button> </p-card
+>}
+
+<div class="grid-container">
+    @if(posts){
+    <div *ngFor="let post of posts">
+        <p-card [header]="post.title">
+            <div [innerHTML]="post.content"></div>
+        </p-card>
+    </div>
+    } @else {
+    <p-card>Carregando...</p-card>
+    }
+</div>
+<p-toast />

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Post } from '../shared/interfaces/post.interface';
 import { PostsService } from '../shared/services/posts.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-blog',
@@ -10,8 +11,8 @@ import { PostsService } from '../shared/services/posts.service';
     standalone: false
 })
 export class Blog {
-    posts: Post[] = [];
-    latestPost!: Post;
+    showEditor: boolean = false;
+    posts!: Post[];
 
     newBlog: Post = {
         title: '',
@@ -21,25 +22,19 @@ export class Blog {
 
     contentEditorValue: string = '';
 
-constructor(private sanitizer: DomSanitizer, private postService: PostsService) {}
-
-    ngOnInit() {
+    constructor(private postService: PostsService, private messageService: MessageService) {
         this.setupComponents();
-
-        this.getPosts();
     }
 
     setupComponents() {
+        this.getPosts();
     }
 
     getPosts() {
-        this.postService.getPosts().subscribe(response => {
-            this.posts = response;
-            this.latestPost = this.posts[0];
-        });
+        this.postService.getPosts().subscribe(response => (this.posts = response));
     }
 
-        onSubmit() {
+    onSubmit() {
         const formData: FormData = new FormData();
 
         formData.append('title', this.newBlog.title);
@@ -48,6 +43,26 @@ constructor(private sanitizer: DomSanitizer, private postService: PostsService) 
 
         console.log('onSubmit! ', this.newBlog, formData);
 
-        this.postService.createPost(formData).subscribe(response => console.log('API response: ', response));
+        this.postService.createPost(formData).subscribe(
+            response => {
+                this.messageService.add({
+                    severity: 'info',
+                    summary: 'Post criado!',
+                    detail: 'Post registrado com sucesso!',
+                    life: 3000
+                });
+
+                console.log('API response: ', response);
+
+                this.getPosts();
+            },
+            error => {
+                this.messageService.add({
+                    severity: 'info',
+                    summary: 'Erro ao criar post!',
+                    life: 3000
+                });
+            }
+        );
     }
 }
