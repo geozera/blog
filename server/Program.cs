@@ -5,7 +5,18 @@ using server;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BloggingDbContext>();
 builder.Services.AddAntiforgery(options => options.SuppressXFrameOptionsHeader = true);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 var app = builder.Build();
+app.UseCors("AllowAngular");
 
 app.UseAntiforgery();
 
