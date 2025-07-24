@@ -1,0 +1,29 @@
+<ng-container>
+        <input
+            type="text"
+            pInputText
+            [(ngModel)]="newBlog.title"
+        />
+        <input
+            type="text"
+            pInputText
+            [(ngModel)]="newBlog.author"
+        />
+
+        <p-editor
+            [(ngModel)]="newBlog.content"
+            [style]="{ height: '320px' }"
+        ></p-editor>
+
+        <p-button
+            [label]="'Publicar'"
+            [raised]="true"
+            (onClick)="onSubmit()"
+        ></p-button>
+
+        <div *ngFor="let post of posts">
+            <p-card [header]="post.title">
+                <div [innerHTML]="post.content"></div>
+            </p-card>
+        </div>
+    </ng-container>
