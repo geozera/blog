@@ -10,13 +10,24 @@ services:
             - postgres_data:/var/lib/postgresql/data
         networks:
             - BlogNet
-    blog-api:
+    api:
         ports:
             - '5177:8080'
         build:
-            dockerfile: blog-api.dockerfile
+            dockerfile: api.dockerfile
         depends_on:
             - postgres
+        networks:
+            - BlogNet
+
+    client:
+        ports:
+            - '4200:8080'
+        build:
+            dockerfile: client.dockerfile
+        depends_on:
+            - postgres
+            - api
         networks:
             - BlogNet
 
