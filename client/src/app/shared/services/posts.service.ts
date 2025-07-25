@@ -7,17 +7,15 @@ import { Post } from '../interfaces/post.interface';
     providedIn: 'root'
 })
 export class PostsService {
+    private readonly _url: string = 'http://localhost:5177/blogs';
+
     constructor(private http: HttpClient) {}
 
-    private URL: string = 'http://localhost:5177';
-
-    private POSTS_URL: string = `${this.URL}/blogs`;
-
     getPosts(options?: any): Observable<Post[]> {
-        return this.http.get<Post[]>(this.POSTS_URL);
+        return this.http.get<Post[]>(this._url);
     }
 
     createPost(post: FormData): Observable<Post> {
-        return this.http.post<Post>(this.POSTS_URL, post);
+        return this.http.post<Post>(this._url, post);
     }
 }

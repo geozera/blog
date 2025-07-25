@@ -1,5 +1,4 @@
-<div class="last-post">
-    <p-card [header]='`Último Post por ${spotlightPost.author}:  "${spotlightPost.title}"`'>
-        <div [innerHTML]="spotlightPost.content.slice(0, 50) + (spotlightPost.content.length > 50 ? '...' : '')"></div>
-    </p-card>
-</div>
+<app-post
+    *ngIf="spotlightPost"
+    [post]="spotlightPost"
+></app-post>

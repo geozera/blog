@@ -11,11 +11,12 @@ import { About } from './about/about';
 import { Contact } from './contact/contact';
 import { Home } from './home/home';
 import { ToastModule } from 'primeng/toast';
-import { Intro } from "./intro/intro";
-import { LastPost } from "./last-post/last-post";
+import { Intro } from './intro/intro';
+import { LastPost } from './last-post/last-post';
+import { PostComponent } from './blog/post/post';
 
 @NgModule({
-    declarations: [Home, Blog, About, Contact, Intro, LastPost],
+    declarations: [Home, Blog, About, Contact, Intro, LastPost, PostComponent],
     imports: [CommonModule, ButtonModule, CommonModule, CardModule, MenubarModule, EditorModule, FormsModule, InputTextModule, ToastModule]
 })
 export class AppModule {}
