@@ -14,9 +14,23 @@ import { ToastModule } from 'primeng/toast';
 import { Intro } from './intro/intro';
 import { LastPost } from './last-post/last-post';
 import { PostComponent } from './blog/post/post';
+import { Admin } from './admin/admin';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
-    declarations: [Home, Blog, About, Contact, Intro, LastPost, PostComponent],
-    imports: [CommonModule, ButtonModule, CommonModule, CardModule, MenubarModule, EditorModule, FormsModule, InputTextModule, ToastModule]
+    declarations: [Home, Blog, About, Contact, Intro, LastPost, PostComponent, Admin],
+    imports: [
+        CommonModule,
+        ButtonModule,
+        CommonModule,
+        CardModule,
+        MenubarModule,
+        EditorModule,
+        FormsModule,
+        InputTextModule,
+        ToastModule,
+        FloatLabelModule
+    ]
 })
 export class AppModule {}

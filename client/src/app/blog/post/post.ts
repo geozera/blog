@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Post } from '../../shared/interfaces/post.interface';
+import { IPost } from '../../shared/interfaces/post.interface';
 
 @Component({
     selector: 'app-post',
@@ -9,7 +9,7 @@ import { Post } from '../../shared/interfaces/post.interface';
     inputs: [{ name: 'post', required: true }]
 })
 export class PostComponent implements OnInit {
-    @Input('post') post!: Post;
+    @Input('post') post!: IPost;
 
     header: string = '...';
     subHeader: string = '...';

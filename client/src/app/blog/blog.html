@@ -1,39 +1,5 @@
 <div class="grid-container-1">
-    <div>
-        <p-button
-            [label]="'Novo post'"
-            [raised]="true"
-            (onClick)="showEditor = !showEditor"
-        ></p-button>
-    </div>
-    @if (showEditor){
-    <div>
-        <p-card>
-            <input
-                type="text"
-                pInputText
-                [(ngModel)]="newBlog.title"
-            />
-            <input
-                type="text"
-                pInputText
-                [(ngModel)]="newBlog.author"
-            />
-
-            <p-editor
-                [(ngModel)]="newBlog.content"
-                [style]="{ height: '200px' }"
-                [required]="true"
-            ></p-editor>
-
-            <p-button
-                [label]="'Publicar'"
-                [raised]="true"
-                (onClick)="onSubmit()"
-            ></p-button>
-        </p-card>
-    </div>
-    }
+    
 </div>
 
 <div class="grid-container">
@@ -45,4 +11,3 @@
     <p-card>Carregando...</p-card>
     }
 </div>
-<p-toast />

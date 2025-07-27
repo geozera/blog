@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { PostsService } from '../shared/services/posts.service';
-import { Post } from '../shared/interfaces/post.interface';
+import { IPost } from '../shared/interfaces/post.interface';
 
 @Component({
     selector: 'app-last-post',
@@ -9,7 +9,7 @@ import { Post } from '../shared/interfaces/post.interface';
     standalone: false
 })
 export class LastPost {
-    spotlightPost!: Post;
+    spotlightPost!: IPost;
 
     constructor(private postService: PostsService) {
         this.postService.getPosts().subscribe(response => (this.spotlightPost = response[0]));

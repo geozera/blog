@@ -14,7 +14,7 @@ import { AppModule } from './app-module';
     selector: 'app-root',
     templateUrl: './app.html',
     standalone: true,
-    providers:[MessageService],
+    providers: [MessageService],
     imports: [ButtonModule, CommonModule, CardModule, MenubarModule, EditorModule, FormsModule, InputTextModule, RouterModule, AppModule]
 })
 export class App implements OnInit {
