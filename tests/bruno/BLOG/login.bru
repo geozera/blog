@@ -1,0 +1,18 @@
+meta {
+  name: login
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:5177/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "username": "admin",
+    "password": "geooeg0803"
+  }
+}

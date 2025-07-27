@@ -1,6 +1,12 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using server;
+
+var secretKey = Encoding.ASCII.GetBytes("3AqzJfioX6TWWIW9y7axQkwLk3Ltex8v");
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BloggingDbContext>();
@@ -15,7 +21,26 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseCors("AllowAngular");
 
 app.UseAntiforgery();
@@ -53,7 +78,7 @@ app.MapPost("/blogs", async ([FromForm] BlogPostRequest postRequest, HttpRequest
 
     return Results.Ok(post);
 
-}).DisableAntiforgery();
+}).DisableAntiforgery().RequireAuthorization();
 
 app.MapPut("/blogs", async (BloggingDbContext db, BlogPost newBlog) =>
 {
@@ -74,7 +99,7 @@ app.MapPut("/blogs", async (BloggingDbContext db, BlogPost newBlog) =>
     await db.SaveChangesAsync();
 
     return Results.Ok(await db.Posts.Where(b => b.BlogId == newBlog.BlogId).FirstAsync());
-});
+}).RequireAuthorization();
 
 app.MapGet("/blogs", async (BloggingDbContext db) =>
 {
@@ -105,7 +130,7 @@ app.MapDelete("/blogs/{id}", async (BloggingDbContext db, int id) =>
 
     await db.SaveChangesAsync();
 
-});
+}).RequireAuthorization();
 
 app.Use(async (context, next) =>
 {
@@ -125,4 +150,35 @@ app.Use(async (context, next) =>
     else await next();
 });
 
+app.MapPost("/login", (LoginRequest login) =>
+{
+    if (login.Username != "admin" || login.Password != "geooeg0803")
+        return Results.Unauthorized();
+
+    var claims = new[] {
+        new Claim(ClaimTypes.Name, login.Username)
+    };
+
+    var key = new SymmetricSecurityKey(secretKey);
+    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+    var token = new JwtSecurityToken(
+        claims: claims,
+        expires: DateTime.UtcNow.AddHours(1),
+        signingCredentials: creds
+    );
+
+    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+    return Results.Ok(new { token = tokenString });
+});
+
+
+
 app.Run();
+
+public class LoginRequest
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
+}
