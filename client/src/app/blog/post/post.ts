@@ -17,7 +17,7 @@ export class PostComponent implements OnInit {
     ngOnInit(): void {
         if (this.post) {
             this.header = this.post?.title || '';
-            this.subHeader = `por ${this.post?.author || 'Anônimo'} em ${new Date(String(this.post.createdAt)).toLocaleDateString()}`;
+            this.subHeader = `por ${this.post?.author || 'Anônimo'} em ${new Date(String(this.post.createdAt)).toLocaleDateString('pt-BR')}`;
         }
     }
 }
