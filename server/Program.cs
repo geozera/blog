@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using server;
 
 var secretKey = Encoding.ASCII.GetBytes("3AqzJfioX6TWWIW9y7axQkwLk3Ltex8v");
+var refreshTokens = new Dictionary<string, (string token, DateTime expiresAt)>();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<BloggingDbContext>();
@@ -150,7 +151,7 @@ app.Use(async (context, next) =>
     else await next();
 });
 
-app.MapPost("/login", (LoginRequest login) =>
+app.MapPost("/login", (LoginRequest login, HttpResponse response) =>
 {
     if (login.Username != "admin" || login.Password != "geooeg0803")
         return Results.Unauthorized();
@@ -161,19 +162,66 @@ app.MapPost("/login", (LoginRequest login) =>
 
     var key = new SymmetricSecurityKey(secretKey);
     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+    var tokenExpireAt = DateTime.UtcNow.AddHours(1);
 
     var token = new JwtSecurityToken(
         claims: claims,
-        expires: DateTime.UtcNow.AddHours(1),
+        expires: tokenExpireAt,
         signingCredentials: creds
     );
 
     var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+    var refreshToken = Guid.NewGuid().ToString();
+
+    response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+    {
+        HttpOnly = true,
+        Secure = true,
+        SameSite = SameSiteMode.Unspecified,
+        Expires = DateTimeOffset.UtcNow.AddDays(7)
+    });
+
+    refreshTokens.Add(refreshToken, (tokenString, tokenExpireAt));
 
     return Results.Ok(new { token = tokenString });
 });
 
+app.MapPost("/refresh", (HttpRequest request, HttpResponse response) =>
+{
 
+    if (!request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        return Results.BadRequest();
+
+    if (!ValidateRefreshToken(refreshToken))
+        return Results.Unauthorized();
+
+    var tokenExpireAt = DateTime.UtcNow.AddHours(1);
+
+    var token = new JwtSecurityToken(
+       expires: tokenExpireAt
+    );
+
+    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+    refreshTokens.Remove(refreshToken);
+    refreshTokens.Add(refreshToken, (tokenString, tokenExpireAt));
+
+    return Results.Ok(new
+    {
+        token = tokenString
+    });
+});
+
+bool ValidateRefreshToken(string token)
+{
+    if (!refreshTokens.TryGetValue(token, out var entry))
+        return false;
+
+    if (entry.expiresAt < DateTime.UtcNow)
+        return false;
+
+    return true;
+}
 
 app.Run();
 
