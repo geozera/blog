@@ -1,13 +1,22 @@
-import { HttpEvent, HttpHandler, HttpHandlerFn, HttpRequest } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { HttpEvent, HttpHandler, HttpHandlerFn, HttpRequest, HttpResponse, HttpStatusCode } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 export function authInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
-    const token = localStorage.getItem('token');
-    if (token) {
-        const cloned = req.clone({
-            headers: req.headers.set('Authorization', `Bearer ${token}`)
-        });
-        return next(cloned);
-    }
-    return next(req);
+    const authService = inject(AuthService);
+
+    const token = authService.getAuthToken();
+    const cloned = !!token
+        ? req.clone({
+              headers: req.headers.set('Authorization', `Bearer ${token}`)
+          })
+        : req;
+
+    return next(cloned).pipe(
+        catchError((err: HttpResponse<unknown>) => {
+            if (!err.ok) authService.resetAuthToken();
+            return next(cloned);
+        })
+    );
 }

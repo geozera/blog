@@ -1,21 +1,25 @@
 <div style="display: grid; grid-template-columns: 60px 150px; gap: 1rem; padding: 1rem">
-        <label pButtonLabel for="username">Usuário</label>
-        <input
-            type="text"
-            pInputText
-            [(ngModel)]="credentials.username"
-            id="username"
-            autocomplete="off"
-        />
-        <label for="password">Senha</label>
-        <input
-            type="text"
-            pInputText
-            [(ngModel)]="credentials.password"
-            id="password"
-            [type]="'password'"
-            autocomplete="off"
-        />
+    <label
+        pButtonLabel
+        for="username"
+        >Usuário</label
+    >
+    <input
+        type="text"
+        pInputText
+        [(ngModel)]="credentials.username"
+        id="username"
+        autocomplete="off"
+    />
+    <label for="password">Senha</label>
+    <input
+        type="text"
+        pInputText
+        [(ngModel)]="credentials.password"
+        id="password"
+        [type]="'password'"
+        autocomplete="off"
+    />
 </div>
 <div style="display: grid; grid-template-columns: 60px 60px; gap: 1rem; padding: 1rem">
     <p-button
@@ -24,7 +28,7 @@
         (onClick)="onSubmitAuthenticate()"
     ></p-button>
 
-    @if(isAuthenticated){
+    @if(isAuthenticated()){
     <p-button
         [label]="'Sair'"
         [raised]="true"
@@ -32,32 +36,32 @@
     ></p-button
     >}
 </div>
-@if(isAuthenticated){
+@if(isAuthenticated()){
 <div style="display: grid; grid-template-columns: 100%; gap: 1rem; padding: 1rem">
-        <p-card [header]="'Novo Post'">
-            <input
-                type="text"
-                pInputText
-                [(ngModel)]="newBlog.title"
-            />
-            <input
-                type="text"
-                pInputText
-                [(ngModel)]="newBlog.author"
-            />
+    <p-card [header]="'Novo Post'">
+        <input
+            type="text"
+            pInputText
+            [(ngModel)]="newBlog.title"
+        />
+        <input
+            type="text"
+            pInputText
+            [(ngModel)]="newBlog.author"
+        />
 
-            <p-editor
-                [(ngModel)]="newBlog.content"
-                [style]="{ height: '200px' }"
-                [required]="true"
-            ></p-editor>
+        <p-editor
+            [(ngModel)]="newBlog.content"
+            [style]="{ height: '200px' }"
+            [required]="true"
+        ></p-editor>
 
-            <p-button
-                [label]="'Publicar'"
-                [raised]="true"
-                (onClick)="onSubmitNewPost()"
-            ></p-button>
-        </p-card>
+        <p-button
+            [label]="'Publicar'"
+            [raised]="true"
+            (onClick)="onSubmitNewPost()"
+        ></p-button>
+    </p-card>
 </div>
 }
 

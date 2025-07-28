@@ -23,12 +23,20 @@ export class Admin {
         author: ''
     };
 
-    isAuthenticated: boolean = false;
+    isAuthenticated: () => boolean;
 
     showEditor: boolean = false;
 
     constructor(private postService: PostsService, private messageService: MessageService, private authService: AuthService) {
-        this.isAuthenticated = !!localStorage.getItem('token');
+        this.isAuthenticated = authService.isAuthenticated.bind(this);
+    }
+
+    resetEditor() {
+        this.newBlog = {
+            author: '',
+            content: '',
+            title: ''
+        };
     }
 
     onSubmitAuthenticate() {
@@ -37,17 +45,18 @@ export class Admin {
         this.authService
             .authenticate(this.credentials)
             .then(() => {
-                this.isAuthenticated = this.authService.isAuthenticated();
+                this.isAuthenticated = this.authService.isAuthenticated.bind(this);
                 this.messageService.add({
                     severity: 'info',
-                    summary: 'Conectado!',
+                    summary: this.authService.isAuthenticated() ? 'Conectado!' : 'Erro na autenticação!',
                     life: 3000
                 });
             })
-            .catch(() => {
+            .catch(err => {
                 this.messageService.add({
                     severity: 'info',
                     summary: 'Erro na autenticação!',
+                    detail: err,
                     life: 3000
                 });
             });
@@ -67,7 +76,7 @@ export class Admin {
                 this.messageService.add({
                     severity: 'info',
                     summary: 'Post criado!',
-                    detail: 'Post registrado com sucesso!',
+                    detail: `Post  "${response.title}" registrado com sucesso!`,
                     life: 3000
                 });
             },
@@ -82,18 +91,17 @@ export class Admin {
     }
 
     saveAccessToken(token: string) {
-        this.isAuthenticated = true;
-        localStorage.setItem('token', token);
+        this.authService.setAuthToken(token);
     }
 
     resetAccessToken() {
-        this.isAuthenticated = false;
-        localStorage.removeItem('token');
+        this.authService.resetAuthToken();
 
-        this.messageService.add({
-            severity: 'warn',
-            summary: 'Desconectado!',
-            life: 3000
-        });
+        if (!this.authService.isAuthenticated())
+            this.messageService.add({
+                severity: 'warn',
+                summary: 'Desconectado!',
+                life: 3000
+            });
     }
 }
