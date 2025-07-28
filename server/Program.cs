@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using server.dtos;
 using server;
 
 var secretKey = Encoding.ASCII.GetBytes("3AqzJfioX6TWWIW9y7axQkwLk3Ltex8v");
@@ -224,9 +225,3 @@ bool ValidateRefreshToken(string token)
 }
 
 app.Run();
-
-public class LoginRequest
-{
-    public string Username { get; set; }
-    public string Password { get; set; }
-}

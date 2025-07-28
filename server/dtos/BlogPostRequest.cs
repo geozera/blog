@@ -1,3 +1,5 @@
+namespace server.dtos;
+
 public class BlogPostRequest
 {
     public string Title { get; set; }
