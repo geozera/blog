@@ -1,3 +1,5 @@
+@if(!isAuthenticated()){
+
 <div style="display: grid; grid-template-columns: 60px 150px; gap: 1rem; padding: 1rem">
     <label
         pButtonLabel
@@ -27,29 +29,37 @@
         [raised]="true"
         (onClick)="onSubmitAuthenticate()"
     ></p-button>
-
-    @if(isAuthenticated()){
-    <p-button
-        [label]="'Sair'"
-        [raised]="true"
-        (onClick)="resetAccessToken()"
-    ></p-button
-    >}
 </div>
-@if(isAuthenticated()){
-<div style="display: grid; grid-template-columns: 100%; gap: 1rem; padding: 1rem">
-    <p-card [header]="'Novo Post'">
-        <input
-            type="text"
-            pInputText
-            [(ngModel)]="newBlog.title"
-        />
-        <input
-            type="text"
-            pInputText
-            [(ngModel)]="newBlog.author"
-        />
+} @else{
+<div>
+    <p-card
+        [header]="'Novo Post'"
+        [subheader]="'Sobre o que vamos falar hoje?'"
+    ></p-card>
 
+    <p-card
+        ><div style="display: grid; grid-template-columns: 200px 200px; gap: 15px; padding-bottom: 15px">
+            <div>
+                <label for="title">Título</label>
+                <input
+                    id="title"
+                    type="text"
+                    pInputText
+                    [(ngModel)]="newBlog.title"
+                />
+            </div>
+            <div>
+                <label for="author">Autor</label>
+                <input
+                    id="author"
+                    type="text"
+                    pInputText
+                    [(ngModel)]="newBlog.author"
+                />
+            </div></div
+    ></p-card>
+
+    <p-card>
         <p-editor
             [(ngModel)]="newBlog.content"
             [style]="{ height: '200px' }"

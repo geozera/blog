@@ -20,7 +20,7 @@ export class Admin {
     newBlog: IPost = {
         title: '',
         content: '',
-        author: ''
+        author: 'Geovany Bezerra'
     };
 
     isAuthenticated: () => boolean;
