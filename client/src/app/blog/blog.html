@@ -1,13 +1,16 @@
-<div class="grid-container-1">
-    
-</div>
+@if(isAuthenticated){
+<p-button
+    [style]="{ 'margin-left': '15px', 'margin-top': '15px' }"
+    [label]="'Novo post'"
+    [raised]="true"
+    (onClick)="navigate(['admin'])"
+></p-button>
+}
 
 <div class="grid-container">
-    @if(posts){
-    <div *ngFor="let post of posts">
-        <app-post [post]="post"></app-post>
-    </div>
-    } @else {
+    @if(posts.length){ @for(post of posts; track post.createdAt){
+    <app-post [post]="post"></app-post>
+    } } @else {
     <p-card>Carregando...</p-card>
     }
 </div>
