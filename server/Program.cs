@@ -224,4 +224,11 @@ bool ValidateRefreshToken(string token)
     return true;
 }
 
+// aplica migrações automaticamente
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BloggingDbContext>();
+    db.Database.Migrate();
+}
+
 app.Run();
