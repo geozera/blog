@@ -40,7 +40,6 @@ export class Admin {
     }
 
     onSubmitAuthenticate() {
-        console.log('onSubmit! ', this.credentials);
 
         this.authService
             .authenticate(this.credentials)
@@ -68,8 +67,6 @@ export class Admin {
         formData.append('title', this.newBlog.title);
         formData.append('author', this.newBlog.author);
         formData.append('content', this.newBlog.content);
-
-        console.log('onSubmit! ', this.newBlog, formData);
 
         this.postService.createPost(formData).subscribe(
             response => {

@@ -8,7 +8,7 @@
 }
 
 <div class="grid-container">
-    @if(posts.length){ @for(post of posts; track post.createdAt){
+    @if(posts){ @for(post of posts; track post.createdAt){
     <app-post [post]="post"></app-post>
     } } @else {
     <p-card>Carregando...</p-card>

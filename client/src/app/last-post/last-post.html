@@ -1,4 +1,1 @@
-<app-post
-    *ngIf="spotlightPost"
-    [post]="spotlightPost"
-></app-post>
+@if(spotlightPost){<app-post [post]="spotlightPost"></app-post>} @else{<span>...</span>}

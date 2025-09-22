@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { PostsService } from '../shared/services/posts.service';
 import { IPost } from '../shared/interfaces/post.interface';
 
@@ -8,10 +8,15 @@ import { IPost } from '../shared/interfaces/post.interface';
     styleUrl: './last-post.scss',
     standalone: false
 })
-export class LastPost {
-    spotlightPost!: IPost;
+export class LastPost implements OnInit {
+    spotlightPost: IPost | undefined;
 
-    constructor(private postService: PostsService) {
-        this.postService.getPosts().subscribe(response => (this.spotlightPost = response[0]));
+    constructor(private postService: PostsService, private cd: ChangeDetectorRef) {}
+
+    ngOnInit() {
+        this.postService.getPosts().subscribe(response => {
+            this.spotlightPost = response[response.length - 1];
+            this.cd.detectChanges();
+        });
     }
 }

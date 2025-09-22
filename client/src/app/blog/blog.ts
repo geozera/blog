@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
     standalone: false
 })
 export class Blog implements OnInit {
-    posts!: IPost[];
+    posts: IPost[] | undefined;
 
     contentEditorValue: string = '';
     isAuthenticated: boolean = false;
