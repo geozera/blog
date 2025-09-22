@@ -1,0 +1,13 @@
+- Card de listagem de blogs (/blogs)
+    - Limitar conteúdo, adicionar botão "ver mais" que abre um modal para leitura completa
+    - Atalho para edição e exclusão do post (quando autenticado)
+    - Número de visualizações
+- Página inicial (/home)
+    - Atalho para edição
+    - Adicionar identificador "último post" ao card
+- Contato (/contact)
+    - Atalho para edição
+- Geral
+    - Estilização dos componentes
+    - Modo escuro
+
