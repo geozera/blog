@@ -10,26 +10,34 @@ services:
             - postgres_data:/var/lib/postgresql/data
         networks:
             - BlogNet
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
     api:
         ports:
             - '5177:8080'
         build:
             dockerfile: api.dockerfile
-        depends_on:
-            - postgres
         networks:
             - BlogNet
+        depends_on:
+            postgres:
+                condition: service_healthy
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Docker
 
-    client:
-        ports:
-            - '4200:8080'
-        build:
-            dockerfile: client.dockerfile
-        depends_on:
-            - postgres
-            - api
-        networks:
-            - BlogNet
+    # client:
+    #     ports:
+    #         - '4200:8080'
+    #     build:
+    #         dockerfile: client.dockerfile
+    #     depends_on:
+    #         - postgres
+    #         - api
+    #     networks:
+    #         - BlogNet
 
 volumes:
     postgres_data:
