@@ -8,8 +8,17 @@ public class BloggingDbContext : DbContext
     public DbSet<BlogPost> Posts { get; set; }
     public DbSet<BlogAttachment> Attachments { get; set; }
 
+    private readonly IConfiguration _configuration;
+
+    public BloggingDbContext(DbContextOptions<BloggingDbContext> options, IConfiguration configuration) : base(options)
+    {
+        _configuration = configuration;
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseNpgsql($"Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=blogblog");
+    {
+        if (!options.IsConfigured) options.UseNpgsql(_configuration.GetConnectionString("Blogging"));
+    }
 
     public override int SaveChanges()
     {
