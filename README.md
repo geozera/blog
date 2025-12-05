@@ -24,10 +24,10 @@ docker compose up -d --force-recreate --build --remove-orphans api
 
 Flags breakdown:
 
-(\-\-build) Redo the build of the image (hence redeploying the packages with the new code).
+(\-\-build) Redo the build of the image (so docker compose don't uses any cached images).
 
-(\-\-remove-orphans) Remove the packages from previous builds.
+(\-\-remove-orphans) Remove the packages from previous builds (for cleanup).
 
 (\-\-force-recreate) Recreate the container even if it's already up.
 
-(api) This will apply only to the api service, so docker compose don't restart the other services for no reason.
+(api) Only do this operation to the api service, no need to restart the other services for no reason, specially with the --build command, which can make the startup process take longer.
