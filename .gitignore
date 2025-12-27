@@ -46,9 +46,6 @@
 */bin
 */obj
 
-# EF Migrations
-*/Migrations
-
 # System files
 .DS_Store
 Thumbs.db
