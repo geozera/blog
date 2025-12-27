@@ -28,16 +28,16 @@ services:
         environment:
             - ASPNETCORE_ENVIRONMENT=Docker
 
-    # client:
-    #     ports:
-    #         - '4200:8080'
-    #     build:
-    #         dockerfile: client.dockerfile
-    #     depends_on:
-    #         - postgres
-    #         - api
-    #     networks:
-    #         - BlogNet
+    client:
+        ports:
+            - '4200:80'
+        build:
+            dockerfile: client.dockerfile
+        depends_on:
+            - postgres
+            - api
+        networks:
+            - BlogNet
 
 volumes:
     postgres_data:
