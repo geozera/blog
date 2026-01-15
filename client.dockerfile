@@ -16,6 +16,10 @@ RUN npm run build
 FROM nginx:alpine AS runner
 
 COPY --from=builder /app/dist/blog/browser/* /usr/share/nginx/html/
+COPY ./client/nginx.conf /etc/nginx/nginx.conf
+
+# Remove the default nginx config to prevent conflicts
+RUN rm -f /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
