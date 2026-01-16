@@ -2,6 +2,8 @@
 
 This is the code used in my personal blog. The blog itself is simple, the focus of this project is to make a website that's easy to maintain and deploy.
 
+![Homepage](docs/images/homepage.png)
+
 The whole architecture is based on docker containers.
 
 ## Initial Setup
