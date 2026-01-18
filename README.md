@@ -14,7 +14,7 @@ To start the application, you can simply run
 docker compose up -d
 ````
 
-This will spin up the containers of the database, along with the API and run its migration scripts, ending with the client.
+This will spin up the containers of the database along with the API and the client.
 
 ## Useful commands during development
 
